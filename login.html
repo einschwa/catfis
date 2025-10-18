@@ -46,6 +46,17 @@
     </script>
 </head>
 <body>
+    <!-- fixed night mode toggle (outside container) -->
+    <div class="fixed-night-toggle">
+        <button id="nightModeToggle" class="switch" role="switch" aria-checked="false" aria-label="Toggle night mode" title="Toggle night mode">
+            <span class="slider" aria-hidden="true">
+                <span class="icon icon-moon">🌙</span>
+                <span class="icon icon-sun">☀️</span>
+                <span class="knob" aria-hidden="true"></span>
+            </span>
+        </button>
+    </div>
+
     <div class="container">
         <h2>Login</h2>
         <form id="loginForm">
@@ -59,9 +70,7 @@
                 <button class="btn" type="submit">Login</button>
                 <button type="button" id="goSignup" class="btn secondary">Daftar</button>
             </p>
-            <p style="margin-top:12px">
-                <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
-            </p>
+            <!-- night mode switch moved to fixed position top-right -->
         </form>
     </div>
 </body>

@@ -70,6 +70,17 @@
     </script>
 </head>
 <body>
+    <!-- fixed night mode toggle (outside container) -->
+    <div class="fixed-night-toggle">
+        <button id="nightModeToggle" class="switch" role="switch" aria-checked="false" aria-label="Toggle night mode" title="Toggle night mode">
+            <span class="slider" aria-hidden="true">
+                <span class="icon icon-moon">🌙</span>
+                <span class="icon icon-sun">☀️</span>
+                <span class="knob" aria-hidden="true"></span>
+            </span>
+        </button>
+    </div>
+
     <div class="container">
         <h2>Form Pendaftaran (Asisten Fisika Lab 2)</h2>
         <form id="signupForm" enctype="multipart/form-data">
@@ -89,14 +100,19 @@
                 <input name="prioritas" type="number" min="1" max="10" required>
             </label>
 
+            <label>Bahasa Pemrograman yang Dikuasai
             <div class="field-row">
-                <div>
-                    <label><input type="checkbox" name="lang_python" value="1"> Python</label>
+                    <div>
+                        <label>Python <input type="checkbox" name="lang_python" value="1"></label>
+                    </div>
                 </div>
-                <div>
-                    <label><input type="checkbox" name="lang_matlab" value="1"> MATLAB</label>
+
+                <div class="field-row">
+                    <div>
+                        <label>MATLAB <input type="checkbox" name="lang_matlab" value="1"></label>
+                    </div>
                 </div>
-            </div>
+            </label>
 
             <div>
                 <label>Judul Praktikum 1 (pilih salah satu)
@@ -138,12 +154,13 @@
                 <textarea name="penjelasanJudul"></textarea>
             </label>
 
-            <label>Pengumpulan Berkas (Google Drive link)
+            <label>
+                <span>Pengumpulan Berkas (Google Drive link)</span>
+                <small style="display:block;margin-top:4px">Masukkan link Google Drive (pastikan link dapat diakses oleh reviewer)</small>
                 <input name="berkasLink" type="url" placeholder="https://drive.google.com/…" required>
-                <small>Masukkan link Google Drive (pastikan link dapat diakses oleh reviewer)</small>
             </label>
 
-            <label>Password (untuk demo)
+            <label>Password
                 <input name="password" type="password" required>
             </label>
 
@@ -157,9 +174,7 @@
                 <progress id="uploadProgress" max="100" value="0" style="width:100%"></progress>
             </p>
 
-            <p style="margin-top:12px">
-                <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
-            </p>
+            <!-- night mode switch moved to fixed position top-right -->
         </form>
     </div>
 </body>

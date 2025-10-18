@@ -4,44 +4,86 @@
     --text-color: #0f172a;
 }
 
+*,*::before,*::after{box-sizing:border-box}
 html,body{height:100%;}
 body{
     margin:0;
     font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    line-height:1.5;
     background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
     color: var(--text-color);
 }
-
-.container{max-width:960px;margin:48px auto;padding:24px;background:rgba(255,255,255,0.7);border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.08)}
+.container{max-width:min(920px,92vw);margin:clamp(12px,4vh,48px) auto;padding:clamp(16px,3vw,28px);background:rgba(255,255,255,0.7);border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.08)}
 .dark .container{background:rgba(2,6,23,0.6);}
 
-input,textarea,select{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1;margin-top:6px}
+label{display:block;font-weight:600;margin:12px 0 6px}
+small{color:#64748b}
+input:not([type="checkbox"]):not([type="radio"]),textarea,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #cbd5e1;margin-top:6px;font-size:1rem;min-height:44px;background:#ffffff}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid #2563eb; outline-offset:2px; border-color:#2563eb}
 .dark input,.dark textarea,.dark select{background:#0b1220;color:#fff;border:1px solid #334155}
 
-.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:#2563eb;color:#fff;text-decoration:none}
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:600}
+.btn:hover{filter:brightness(0.95)}
 .btn.secondary{background:#94a3b8;color:#0f172a}
 .btn.small{padding:6px 8px;border-radius:6px;font-size:0.9rem}
 
 .field-row{display:flex;gap:12px}
 .field-row>div{flex:1}
+label input[type="checkbox"]{margin-left:8px !important}
+input[type="checkbox"]{
+    accent-color:#2563eb;
+    width:16px;
+    height:16px;
+    min-height:0;
+    padding:0;
+    transform:scale(0.9);
+    transform-origin:left center;
+}
+progress{width:100%; height:12px}
 
 .timeline{list-style:none;padding:0;margin:0}
 .timeline li{padding:12px;border-left:4px solid #e2e8f0;margin-left:8px;margin-bottom:12px}
 .timeline li .meta{font-size:12px;color:#6b7280}
 
 .status-approved{border-color:#16a34a;background:rgba(16,185,129,0.06)}
-.status-approved td{background:rgba(16,185,129,0.06)}
-
 .status-rejected{border-color:#dc2626;background:rgba(239,68,68,0.06)}
-.status-rejected td{background:rgba(239,68,68,0.06)}
-
 .status-pending{border-color:#f59e0b;background:rgba(245,158,11,0.04)}
-.status-pending td{background:rgba(245,158,11,0.04)}
 
-/* Stage status cells */
-td.status-approved{background:rgba(16,185,129,0.06)}
-td.status-rejected{background:rgba(239,68,68,0.06)}
-td.status-pending{background:rgba(245,158,11,0.04)}
+/* Night mode toggle switch (sun / moon) - button based */
+.switch{position:relative;display:inline-flex;align-items:center;justify-content:center;width:94px;height:40px;background:linear-gradient(90deg,#fff,#fff);border-radius:999px;padding:6px;box-shadow:0 1px 6px rgba(2,6,23,0.08);border:1px solid rgba(15,23,42,0.05);cursor:pointer}
+.switch .slider{display:inline-flex;align-items:center;gap:8px;position:relative;width:100%;padding:0 10px}
+.switch .icon{font-size:18px;line-height:1;opacity:0.9}
+.switch .icon.icon-moon{opacity:0.5}
+.switch .knob{position:absolute;top:50%;left:10px;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(2,6,23,0.12);transition:left .24s ease}
+.switch[aria-checked="true"]{background:linear-gradient(90deg,#0b1220,#132133);color:#fff}
+.switch[aria-checked="true"] .icon.icon-sun{opacity:0.25}
+.switch[aria-checked="true"] .icon.icon-moon{opacity:1}
+.switch[aria-checked="true"] .knob{left:calc(100% - 10px - 22px)}
+
+/* Make sure the toggle sits visually at the top-right when used in header */
+header .mode-switch{margin-left:auto}
+
+/* Fixed night toggle outside container */
+.fixed-night-toggle{position:fixed;top:12px;right:12px;z-index:1200}
+.fixed-night-toggle .switch{width:72px;height:38px}
+.fixed-night-toggle .slider{padding:6px}
+.fixed-night-toggle .icon{font-size:18px}
+
+/* Dark-mode icon contrast */
+.dark .fixed-night-toggle .slider{background:linear-gradient(90deg,#0b1220,#132133);color:#fff}
+
+/* Smooth icon opacity transitions */
+.slider .icon{transition:opacity .18s ease}
+
+/* Focus styles for keyboard accessibility (button) */
+.switch:focus{box-shadow:0 0 0 4px rgba(37,99,235,0.15);outline:none}
+
+/* Tooltip (custom minimal) */
+.fixed-night-toggle .switch[title]:hover::before{
+    content:attr(title);
+    position:fixed;top:48px;right:12px;background:rgba(0,0,0,0.75);color:#fff;padding:6px 8px;border-radius:6px;font-size:12px;z-index:1300;white-space:nowrap
+}
 
 /* Table styling */
 table{width:100%;border-collapse:collapse}
@@ -57,20 +99,13 @@ th{background:rgba(0,0,0,0.02);font-weight:600}
     td::before{content:attr(data-label);font-weight:600}
 }
 
-/* Loading state */
-#loading {
-    color: #6b7280;
-    font-style: italic;
-}
-
-/* Modal z-index */
-#statusModal {
-    z-index: 1000;
-}
-
-#overlay {
-    z-index: 999;
-}
-
 /* responsive */
-@media (max-width:640px){.field-row{flex-direction:column}}
+@media (max-width:640px){
+    .field-row{flex-direction:column}
+    .btn{width:100%; text-align:center}
+    .container{margin:12px; padding:16px}
+}
+
+@media (min-width:1024px){
+    .container{max-width:860px}
+}

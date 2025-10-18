@@ -1,7 +1,7 @@
 // Night mode helper. Persists to localStorage and also writes to Firebase Realtime DB under /settings/nightMode if needed (optional).
 import { getCurrentUser } from './auth.js';
 import { db } from './firebase-init.js';
-import { ref as dbRef, get, set } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+import { ref as dbRef, get, set } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js';
 
 export async function initNightMode() {
     // Load preference from localStorage first
@@ -23,9 +23,21 @@ export async function initNightMode() {
 
     const toggle = document.getElementById('nightModeToggle');
     if (toggle) {
-        toggle.checked = enabled;
-        toggle.addEventListener('change', async (e) => {
-            await setNightMode(e.target.checked);
+        // button-based switch uses aria-checked
+        try { toggle.setAttribute('aria-checked', enabled ? 'true' : 'false'); } catch (e) {}
+        const handler = async (ev) => {
+            const cur = toggle.getAttribute('aria-checked') === 'true';
+            const val = !cur;
+            try { toggle.setAttribute('aria-checked', val ? 'true' : 'false'); } catch (e) {}
+            await setNightMode(val);
+        };
+        toggle.addEventListener('click', handler);
+        // keyboard: Space or Enter should toggle button automatically, but ensure keydown handled for robustness
+        toggle.addEventListener('keydown', (ev) => {
+            if (ev.key === ' ' || ev.key === 'Spacebar' || ev.key === 'Enter') {
+                ev.preventDefault();
+                toggle.click();
+            }
         });
     }
 }
@@ -52,5 +64,10 @@ export async function setNightMode(enabled) {
         }
     } catch (err) {
         console.warn('Could not persist nightMode to DB', err);
+    }
+    // ensure toggle aria reflects final state
+    const toggle = document.getElementById('nightModeToggle');
+    if (toggle) {
+        try { toggle.setAttribute('aria-checked', enabled ? 'true' : 'false'); } catch (e) {}
     }
 }
