@@ -16,6 +16,32 @@ body{
 .container{max-width:min(920px,92vw);margin:clamp(12px,4vh,48px) auto;padding:clamp(16px,3vw,28px);background:rgba(255,255,255,0.7);border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.08)}
 .dark .container{background:rgba(2,6,23,0.6);}
 
+/* Auth page specific styles (login/signup card) */
+.auth-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:40px;background:linear-gradient(135deg,var(--bg-grad-start),var(--bg-grad-end))}
+.auth-card{width:100%;max-width:420px;background:rgba(255,255,255,0.98);border-radius:16px;padding:36px 28px;box-shadow:0 12px 30px rgba(15,23,42,0.08);text-align:center}
+.dark .auth-card{background:rgba(2,6,23,0.72);color:#fff}
+.auth-logo{width:72px;height:72px;margin:-48px auto 8px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:#2b47b3;color:#fff;font-size:32px;box-shadow:0 6px 18px rgba(43,71,179,0.12)}
+.auth-title{margin:6px 0 4px;font-size:20px}
+.auth-subtitle{margin:0 0 18px;color:#6b7280}
+.auth-form{display:block;text-align:left}
+.field{display:block;font-weight:600;margin-bottom:10px}
+.auth-input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid #e6eefc;background:#fff;font-size:14px}
+.dark .auth-input{background:#08101a;color:#fff;border:1px solid #213043}
+.auth-btn{display:block;width:100%;padding:14px 16px;border-radius:12px;background:#2147b7;color:#fff;border:0;font-weight:700;font-size:16px}
+.auth-btn:hover{filter:brightness(.98)}
+
+/* Ensure textarea/select with auth-input behave visually consistent */
+.auth-input[type="text"], .auth-input[type="number"], .auth-input[type="url"], .auth-input[type="password"], .auth-input, select.auth-input, textarea.auth-input{
+    box-sizing:border-box;
+}
+textarea.auth-input{min-height:100px;resize:vertical;padding:12px}
+.auth-form .field{margin-bottom:14px}
+
+@media (max-width:520px){
+    .auth-card{padding:24px 16px;border-radius:12px}
+    .auth-logo{width:60px;height:60px;font-size:28px}
+}
+
 label{display:block;font-weight:600;margin:12px 0 6px}
 small{color:#64748b}
 input:not([type="checkbox"]):not([type="radio"]),textarea,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #cbd5e1;margin-top:6px;font-size:1rem;min-height:44px;background:#ffffff}
