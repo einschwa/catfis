@@ -85,6 +85,51 @@ header .mode-switch{margin-left:auto}
     position:fixed;top:48px;right:12px;background:rgba(0,0,0,0.75);color:#fff;padding:6px 8px;border-radius:6px;font-size:12px;z-index:1300;white-space:nowrap
 }
 
+/* Backdrop overlay that blurs/dims page content behind modal */
+.backdrop{
+    position:fixed;
+    inset:0; /* top:0; right:0; bottom:0; left:0 */
+    background:rgba(2,6,23,0.32);
+    -webkit-backdrop-filter: blur(6px) saturate(0.9);
+    backdrop-filter: blur(6px) saturate(0.9);
+    z-index:1500;
+}
+
+/* Modal - keep it above the backdrop and visually sharp */
+.modal{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:var(--modal-bg, #fff);
+    color:var(--text-color);
+    padding:24px;
+    border-radius:12px;
+    box-shadow:0 8px 28px rgba(2,6,23,0.32);
+    max-width:560px;
+    width:clamp(320px, 90%, 560px);
+    z-index:1600; /* above backdrop */
+}
+
+/* When dark theme is active, modal can use a darker surface */
+.dark .modal{--modal-bg: rgba(6,12,24,0.9); color:#fff}
+
+/* Table wrapper: allow horizontal scroll when content overflows */
+.table-wrapper{overflow:auto; -webkit-overflow-scrolling:touch}
+.table-wrapper table{min-width:920px} /* ensure table can grow and trigger scroll on narrow screens */
+
+/* Transitions and hidden-by-default behavior for backdrop and modal when using class toggles */
+.backdrop{opacity:0;pointer-events:none;transition:opacity .18s ease}
+.modal{opacity:0;transform:translate(-50%,-48%);transition:opacity .2s ease, transform .2s ease}
+
+/* When modal is open, root (html) gets .modal-open */
+.modal-open .backdrop{opacity:1;pointer-events:auto}
+.modal-open .modal{opacity:1;transform:translate(-50%,-50%)}
+
+/* Close button inside modal */
+.modal-close{position:absolute;top:10px;right:10px;background:transparent;border:0;font-size:20px;line-height:1;color:inherit;cursor:pointer;padding:6px;border-radius:6px}
+.modal-close:focus{outline:2px solid rgba(37,99,235,0.2)}
+
 /* Table styling */
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px;border-bottom:1px solid rgba(15,23,42,0.06);text-align:left}
