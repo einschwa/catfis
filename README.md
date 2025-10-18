@@ -1,16 +1,35 @@
 # Asisten Fisika Lab 2 — Applicant site
 
-This repository contains a small web app for applicants to apply for "Asisten Fisika Laboratorium 2". It uses Firebase Realtime Database and Firebase Storage, and Firebase Authentication (email/password) where the email is synthesized from the NRP (`{nrp}@cafis2.local`).
+Lightweight static web app for managing applicants to "Asisten Fisika Laboratorium 2".
+This project is implemented with plain HTML/CSS/JS and uses Firebase (Realtime Database, Storage, Auth).
 
-Files of interest
-- `firebase-init.js` — initialize Firebase with provided config
-- `auth.js` — login/signup code (uses Firebase Auth + Realtime DB for profile data)
-- `storage.js` — helpers for Storage operations
-- `theme.js` & `style.css` — night mode and styling
-- `index.html`, `login.html`, `signup.html`, `home.html`, `admin.html` — pages
+Repository layout (files you'll find in the project root)
+- `index.html` — Landing page with links to login/signup.
+- `login.html` — Login page (NRP-based login). Calls `auth.js` helpers.
+- `signup.html` — Applicant registration form (uploads link to berkas, chooses titles, provides motivation).
+- `home.html` — Applicant dashboard. Shows a stage-based progress timeline (Pengumpulan Berkas → Seleksi Berkas → Interview → Pengumuman Akhir).
+- `admin.html` — Admin panel. Table of applicants with per-stage controls and a "Profil" action to open a full applicant details modal.
+- `style.css` — Main stylesheet: layout, colors, dark theme, modal/backdrop, responsive table and the night-mode switch.
+- `theme.js` — Night-mode helper: initializes toggle, persists to localStorage and (optionally) to the user's settings in the Realtime DB.
+- `auth.js` — Authentication helpers (login/signup flows wired to Firebase Auth + user profile writes to Realtime DB).
+- `firebase-init.js` — Firebase initialization; replace the placeholder config object with your project's settings.
+- `storage.js` — Small helpers to upload/get files from Firebase Storage (used during signup in earlier versions).
+- `admin.js` — Admin-side logic: loads users from Realtime DB, renders the table, opens modals for per-stage edits and applicant detail view, writes updates back to DB.
+- `favicon-phi.svg` — Favicon (Greek letter Phi) used across pages.
+- `README.md` — (this file)
 
-Local testing (recommended)
-1. Serve the directory using a static server (do not open `file://` directly). Example using PowerShell with Python:
+Key behaviors and data shapes
+- Users are stored under `users/{uidOrNrp}` in Realtime Database. Typical fields used by the UI:
+	- `name`, `nrp`, `whatsapp`, `motivasi`, `prioritas`
+	- `programmingLanguages`: array of strings
+	- `researchTitles`: array of strings
+	- `berkasLink` (string): a shareable Google Drive link to the applicant's documents
+	- `currentStage`: one of `berkas`, `seleksi`, `interview`, `pengumuman`
+	- `stageStatuses`: object, e.g. `stageStatuses.berkas = 'approved'|'rejected'|'pending'`, optional `{stage}Note` and `{stage}Date` keys may be present
+	- `role`: `admin` for admin accounts
+
+How to run locally (quick)
+1. Serve this directory with a static server (do not use `file://`):
 
 ```powershell
 # from project root
@@ -18,25 +37,31 @@ python -m http.server 8000
 # then open http://localhost:8000/index.html
 ```
 
-2. Firebase setup (one-time)
-- Create a Firebase project in the Firebase Console.
-- Enable Realtime Database and create a database in the region of your choice. Choose "Start in test mode" for initial testing (but configure rules before production).
-- Enable Firebase Storage and set up a storage bucket.
-- Enable Authentication -> Email/Password provider.
-- Replace the Firebase config object in `firebase-init.js` with your project's config values.
+2. Firebase setup (required for full functionality)
+- Create a Firebase project and enable:
+	- Realtime Database (start with test rules for development, then tighten before production)
+	- Authentication (Email/Password)
+	- Storage (if you plan to upload or host berkas files)
+- Replace the Firebase config object in `firebase-init.js` with your project's config.
 
-3. CORS/Storage
-- If you run into CORS issues with uploads, ensure that your Firebase Storage CORS is configured properly (see Firebase docs). Serving via HTTP usually avoids many file:// CORS problems.
+Developer notes & tips
+- Favicon: `favicon-phi.svg` is referenced in every HTML head.
+- Modal & backdrop: `style.css` uses a dedicated `.backdrop` element with `backdrop-filter` so modals stay sharp while the page behind is blurred.
+- Night mode: controlled by `theme.js` (button with `id="nightModeToggle"`), persisted to localStorage and optionally to `users/{uid}/settings/nightMode`.
+- Admin workflows:
+	- The admin table (in `admin.html`) fetches `users/*` from the DB and skips users with `role==='admin'`.
+	- Per-stage updates are written to `users/{nrp}/stageStatuses/{stageId}` and may update `currentStage` when a stage is approved.
+	- Clicking "Profil" opens a details modal that retrieves the user's profile and shows fields like name, motivation, titles and berkas link.
 
-Notes & caveats
-- For demo simplicity, the app uses a synthetic email `{nrp}@cafis2.local`. For production you should use real email flows.
-- Passwords are handled by Firebase Authentication; no plaintext passwords should be stored in the Realtime DB.
-- This project is a reference implementation and needs security hardening for production.
+Data & security warnings
+- The sample app uses a simplified auth mapping (NRP -> synthetic email) in earlier versions; in production, use real email verification flows.
+- Do NOT deploy the app with open Realtime DB rules. Configure security rules to allow only authenticated users to read/write appropriate paths.
 
-Optional: quick serve script for PowerShell
-- Run `.	ools\serve.ps1` (on Windows PowerShell) to start a simple static server (uses Python if available).
+Want me to do more?
+- I can add:
+	- Focus-trap and better ARIA behavior for the modals.
+	- Inline preview/download buttons for CV/transcript in the applicant modal.
+	- A small script to seed test users into the DB for local testing.
+	- Security rule examples for Firebase Realtime Database and Storage.
 
-If you want, I can:
-- Replace the synthetic-email scheme with a real email-based signup flow.
-- Harden DB & Storage security rules.
-- Add CI or automated tests.
+If you'd like any of the above implemented now, tell me which item and I'll add it.
