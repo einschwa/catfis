@@ -37,15 +37,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadApplicants();
 
-    document.getElementById('closeModal').addEventListener('click', () => {
-        document.getElementById('statusModal').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-    });
+    const oldClose = document.getElementById('closeModal');
+    if (oldClose) oldClose.addEventListener('click', () => closeModal());
     
-    document.getElementById('overlay').addEventListener('click', () => {
-        document.getElementById('statusModal').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-    });
+    // backdrop click should close
+    document.getElementById('overlay').addEventListener('click', () => closeModal());
+
+    // new close controls (icon and cancel button)
+    const closeIcon = document.getElementById('closeModalIcon');
+    if (closeIcon) closeIcon.addEventListener('click', () => closeModal());
+    const cancelBtn = document.getElementById('cancelModalBtn');
+    if (cancelBtn) cancelBtn.addEventListener('click', () => closeModal());
 
     document.getElementById('statusForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -68,16 +70,84 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            document.getElementById('statusModal').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
             await loadApplicants();
             alert('Status diperbarui');
+            closeModal();
         } catch (err) {
             console.error(err);
             alert('Gagal memperbarui status');
         }
     });
 });
+
+// Helper functions for modal open/close and keyboard focus trap
+function openModal() {
+    // show via class on root for transitions
+    document.documentElement.classList.add('modal-open');
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'block';
+    // move focus into modal
+    const modal = document.getElementById('statusModal');
+    if (modal) {
+        modal.style.display = 'block'; // ensure occupies layout for a11y
+        // focus first focusable element
+        const focusable = modal.querySelector('select, textarea, input, button, [tabindex]:not([tabindex="-1"])');
+        if (focusable) focusable.focus();
+    }
+    // bind ESC handler
+    document.addEventListener('keydown', escHandler);
+}
+
+function closeModal() {
+    document.documentElement.classList.remove('modal-open');
+    const modal = document.getElementById('statusModal');
+    if (modal) modal.style.display = 'none';
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'none';
+    document.removeEventListener('keydown', escHandler);
+}
+
+function escHandler(e) {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+        closeModal();
+    }
+}
+
+// Applicant modal helpers
+function openApplicantModal() {
+    document.documentElement.classList.add('modal-open');
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'block';
+    const modal = document.getElementById('applicantModal');
+    if (modal) {
+        modal.style.display = 'block';
+        const focusable = modal.querySelector('button, a, [tabindex]:not([tabindex="-1"])');
+        if (focusable) focusable.focus();
+    }
+    document.addEventListener('keydown', escApplicantHandler);
+}
+
+function closeApplicantModal() {
+    document.documentElement.classList.remove('modal-open');
+    const modal = document.getElementById('applicantModal');
+    if (modal) modal.style.display = 'none';
+    const overlay = document.getElementById('overlay');
+    if (overlay) overlay.style.display = 'none';
+    document.removeEventListener('keydown', escApplicantHandler);
+}
+
+function escApplicantHandler(e) {
+    if (e.key === 'Escape' || e.key === 'Esc') closeApplicantModal();
+}
+
+// wire applicant modal close buttons/backdrop
+const closeApplicantIcon = document.getElementById('closeApplicantIcon');
+if (closeApplicantIcon) closeApplicantIcon.addEventListener('click', () => closeApplicantModal());
+const closeApplicantBtn = document.getElementById('closeApplicantBtn');
+if (closeApplicantBtn) closeApplicantBtn.addEventListener('click', () => closeApplicantModal());
+// clicking the backdrop should close whichever modal is open
+const overlayEl = document.getElementById('overlay');
+if (overlayEl) overlayEl.addEventListener('click', () => { closeModal(); closeApplicantModal(); });
 
 async function loadApplicants() {
     try {
@@ -121,14 +191,8 @@ async function loadApplicants() {
                 <td data-label="NRP">${u.nrp || ''}</td>
                 <td data-label="WhatsApp">${u.whatsapp || ''}</td>
                 ${stageCells}
-                <td data-label="Dokumen">
-                    <div style="display:flex;gap:4px">
-                        <button class="btn small" data-cv="${u.cvURL || ''}">CV</button>
-                        <button class="btn small" data-tr="${u.transkripURL || ''}">Transkrip</button>
-                    </div>
-                </td>
                 <td data-label="Aksi">
-                    <button class="btn small">Profil</button>
+                    <button class="btn small" data-edit="${u.nrp || ''}">Profil</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -143,8 +207,8 @@ async function loadApplicants() {
                     document.getElementById('modalStageId').value = stage.id;
                     document.getElementById('modalStatus').value = stageStatuses[stage.id] || 'pending';
                     document.getElementById('modalNote').value = stageStatuses[stage.id + 'Note'] || '';
-                    document.getElementById('statusModal').style.display = 'block';
-                    document.getElementById('overlay').style.display = 'block';
+                    // open modal using helper for transitions and focus
+                    openModal();
                 });
             });
         });
@@ -164,11 +228,31 @@ async function loadApplicants() {
                 window.open(url, '_blank');
             });
         });
+        // 'Profil' buttons: show full applicant details
         tbody.querySelectorAll('button[data-edit]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const nrp = e.currentTarget.getAttribute('data-edit');
-                document.getElementById('modalNrp').value = nrp;
-                document.getElementById('statusModal').style.display = 'block';
+                if (!nrp) return;
+                try {
+                    const snap = await get(child(ref(db), `users/${nrp}`));
+                    if (!snap.exists()) { alert('Data pelamar tidak ditemukan'); return; }
+                    const u = snap.val();
+                    document.getElementById('app_name').textContent = u.name || '';
+                    document.getElementById('app_nrp').textContent = u.nrp || '';
+                    document.getElementById('app_wp').textContent = u.whatsapp || '';
+                    document.getElementById('app_motivasi').textContent = u.motivasi || '';
+                    document.getElementById('app_prioritas').textContent = u.prioritas || '';
+                    document.getElementById('app_langs').textContent = (u.programmingLanguages || []).join(', ');
+                    document.getElementById('app_titles').textContent = (u.researchTitles || []).join(', ');
+                    const berkasLink = u.berkasLink || u.berkas || '#';
+                    const berkasEl = document.getElementById('app_berkas');
+                    if (berkasEl) { berkasEl.href = berkasLink; berkasEl.textContent = berkasLink; }
+                    // open applicant modal
+                    openApplicantModal();
+                } catch (err) {
+                    console.error(err);
+                    alert('Gagal memuat data pelamar');
+                }
             });
         });
     } catch (err) {
