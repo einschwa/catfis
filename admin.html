@@ -10,11 +10,24 @@
     <script type="module" src="admin.js"></script>
 </head>
 <body>
+    <!-- fixed night mode toggle (outside container) -->
+    <div class="fixed-night-toggle">
+        <button id="nightModeToggle" class="switch" role="switch" aria-checked="false" aria-label="Toggle night mode" title="Toggle night mode">
+            <span class="slider" aria-hidden="true">
+                <span class="icon icon-moon">🌙</span>
+                <span class="icon icon-sun">☀️</span>
+                <span class="knob" aria-hidden="true"></span>
+            </span>
+        </button>
+    </div>
+
     <div class="container">
         <h2>Admin Panel - Kelola Pelamar</h2>
-        <div style="margin-bottom:12px">
-            <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
-            <button id="adminLogoutBtn" class="btn" style="margin-left:12px">Logout</button>
+        <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+            <div></div>
+            <div style="display:flex;align-items:center;gap:12px">
+                <button id="adminLogoutBtn" class="btn">Logout</button>
+            </div>
         </div>
         <table style="width:100%;border-collapse:collapse">
             <thead>

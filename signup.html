@@ -70,6 +70,17 @@
     </script>
 </head>
 <body>
+    <!-- fixed night mode toggle (outside container) -->
+    <div class="fixed-night-toggle">
+        <button id="nightModeToggle" class="switch" role="switch" aria-checked="false" aria-label="Toggle night mode" title="Toggle night mode">
+            <span class="slider" aria-hidden="true">
+                <span class="icon icon-moon">🌙</span>
+                <span class="icon icon-sun">☀️</span>
+                <span class="knob" aria-hidden="true"></span>
+            </span>
+        </button>
+    </div>
+
     <div class="container">
         <h2>Form Pendaftaran (Asisten Fisika Lab 2)</h2>
         <form id="signupForm" enctype="multipart/form-data">
@@ -163,9 +174,7 @@
                 <progress id="uploadProgress" max="100" value="0" style="width:100%"></progress>
             </p>
 
-            <p style="margin-top:12px">
-                <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
-            </p>
+            <!-- night mode switch moved to fixed position top-right -->
         </form>
     </div>
 </body>

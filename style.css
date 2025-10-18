@@ -50,6 +50,41 @@ progress{width:100%; height:12px}
 .status-rejected{border-color:#dc2626;background:rgba(239,68,68,0.06)}
 .status-pending{border-color:#f59e0b;background:rgba(245,158,11,0.04)}
 
+/* Night mode toggle switch (sun / moon) - button based */
+.switch{position:relative;display:inline-flex;align-items:center;justify-content:center;width:94px;height:40px;background:linear-gradient(90deg,#fff,#fff);border-radius:999px;padding:6px;box-shadow:0 1px 6px rgba(2,6,23,0.08);border:1px solid rgba(15,23,42,0.05);cursor:pointer}
+.switch .slider{display:inline-flex;align-items:center;gap:8px;position:relative;width:100%;padding:0 10px}
+.switch .icon{font-size:18px;line-height:1;opacity:0.9}
+.switch .icon.icon-moon{opacity:0.5}
+.switch .knob{position:absolute;top:50%;left:10px;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(2,6,23,0.12);transition:left .24s ease}
+.switch[aria-checked="true"]{background:linear-gradient(90deg,#0b1220,#132133);color:#fff}
+.switch[aria-checked="true"] .icon.icon-sun{opacity:0.25}
+.switch[aria-checked="true"] .icon.icon-moon{opacity:1}
+.switch[aria-checked="true"] .knob{left:calc(100% - 10px - 22px)}
+
+/* Make sure the toggle sits visually at the top-right when used in header */
+header .mode-switch{margin-left:auto}
+
+/* Fixed night toggle outside container */
+.fixed-night-toggle{position:fixed;top:12px;right:12px;z-index:1200}
+.fixed-night-toggle .switch{width:72px;height:38px}
+.fixed-night-toggle .slider{padding:6px}
+.fixed-night-toggle .icon{font-size:18px}
+
+/* Dark-mode icon contrast */
+.dark .fixed-night-toggle .slider{background:linear-gradient(90deg,#0b1220,#132133);color:#fff}
+
+/* Smooth icon opacity transitions */
+.slider .icon{transition:opacity .18s ease}
+
+/* Focus styles for keyboard accessibility (button) */
+.switch:focus{box-shadow:0 0 0 4px rgba(37,99,235,0.15);outline:none}
+
+/* Tooltip (custom minimal) */
+.fixed-night-toggle .switch[title]:hover::before{
+    content:attr(title);
+    position:fixed;top:48px;right:12px;background:rgba(0,0,0,0.75);color:#fff;padding:6px 8px;border-radius:6px;font-size:12px;z-index:1300;white-space:nowrap
+}
+
 /* Table styling */
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px;border-bottom:1px solid rgba(15,23,42,0.06);text-align:left}
