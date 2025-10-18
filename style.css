@@ -30,8 +30,18 @@ input,textarea,select{width:100%;padding:8px;border-radius:6px;border:1px solid 
 .timeline li .meta{font-size:12px;color:#6b7280}
 
 .status-approved{border-color:#16a34a;background:rgba(16,185,129,0.06)}
+.status-approved td{background:rgba(16,185,129,0.06)}
+
 .status-rejected{border-color:#dc2626;background:rgba(239,68,68,0.06)}
+.status-rejected td{background:rgba(239,68,68,0.06)}
+
 .status-pending{border-color:#f59e0b;background:rgba(245,158,11,0.04)}
+.status-pending td{background:rgba(245,158,11,0.04)}
+
+/* Stage status cells */
+td.status-approved{background:rgba(16,185,129,0.06)}
+td.status-rejected{background:rgba(239,68,68,0.06)}
+td.status-pending{background:rgba(245,158,11,0.04)}
 
 /* Table styling */
 table{width:100%;border-collapse:collapse}
@@ -45,6 +55,21 @@ th{background:rgba(0,0,0,0.02);font-weight:600}
     tr{margin-bottom:12px;padding:12px;background:rgba(255,255,255,0.02)}
     td{display:flex;justify-content:space-between;padding:8px 6px}
     td::before{content:attr(data-label);font-weight:600}
+}
+
+/* Loading state */
+#loading {
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Modal z-index */
+#statusModal {
+    z-index: 1000;
+}
+
+#overlay {
+    z-index: 999;
 }
 
 /* responsive */

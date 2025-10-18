@@ -22,30 +22,42 @@
                     <th>Nama</th>
                     <th>NRP</th>
                     <th>WhatsApp</th>
-                    <th>Prioritas</th>
-                    <th>CV</th>
-                    <th>Transkrip</th>
-                    <th>Status</th>
+                    <th>Berkas</th>
+                    <th>Seleksi</th>
+                    <th>Interview</th>
+                    <th>Pengumuman</th>
+                    <th>Dokumen</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody id="adminTableBody"></tbody>
         </table>
 
-        <div id="statusModal" style="display:none;margin-top:12px">
-            <h3>Update Status</h3>
+        <div id="statusModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);max-width:500px;width:90%">
+            <h3>Update Status Tahap <span id="modalStage"></span></h3>
             <form id="statusForm">
                 <input type="hidden" id="modalNrp">
-                <select id="modalStatus">
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                </select>
-                <input id="modalNote" placeholder="Catatan opsional">
-                <button class="btn" type="submit">Simpan</button>
-                <button type="button" id="closeModal" class="btn secondary">Tutup</button>
+                <input type="hidden" id="modalStageId">
+                <div style="margin-bottom:12px">
+                    <label>Status:</label>
+                    <select id="modalStatus" class="full-width">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Diterima</option>
+                        <option value="rejected">Ditolak</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:12px">
+                    <label>Catatan/Keterangan:</label>
+                    <textarea id="modalNote" rows="3" placeholder="Tambahkan catatan atau keterangan disini..."></textarea>
+                </div>
+                <div style="display:flex;gap:12px;justify-content:flex-end">
+                    <button type="button" id="closeModal" class="btn secondary">Tutup</button>
+                    <button class="btn" type="submit">Simpan</button>
+                </div>
             </form>
         </div>
+
+        <div id="overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5)"></div>
     </div>
 </body>
 </html>

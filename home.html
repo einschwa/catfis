@@ -10,59 +10,78 @@
     <script type="module">
     import { initNightMode } from './theme.js';
     import { getCurrentUser, logout } from './auth.js';
-    import { ref, get } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+    import { ref, get } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js';
     import { db } from './firebase-init.js';
 
         initNightMode();
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const cu = getCurrentUser();
-            if (!cu) {
-                window.location.href = 'login.html';
-                return;
-            }
+    const cu = getCurrentUser();
+    if (!cu) {
+        window.location.href = 'login.html';
+        return;
+    }
 
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                logout();
-                window.location.href = 'login.html';
-            });
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        logout();
+        window.location.href = 'login.html';
+    });
 
-            // Load user's application data
-            try {
-                const snapshot = await get(ref(db, `users/${cu.uid}`));
-                if (!snapshot.exists()) {
-                    document.getElementById('content').innerHTML = '<p>Belum mendaftar. <a href="signup.html">Daftar sekarang</a></p>';
-                    return;
-                }
-                const user = snapshot.val();
-                // Show admin link if role is admin
-                const adminLink = document.getElementById('adminLink');
-                if (adminLink) {
-                    if (user.role === 'admin') adminLink.style.display = 'inline-block';
-                    else adminLink.style.display = 'none';
-                }
-                // render timeline
-                const timeline = document.getElementById('timeline');
-                const li = document.createElement('li');
-                li.className = `status-${user.status}`;
-                li.innerHTML = `<strong>Status: ${user.status.toUpperCase()}</strong><div class="meta">Diterapkan pada: ${new Date(user.appliedAt).toLocaleString()}</div><p>${user.motivasi}</p>`;
-                timeline.appendChild(li);
+    // Load user's application data
+    try {
+        const snapshot = await get(ref(db, `users/${cu.uid}`));
+        if (!snapshot.exists()) {
+            document.getElementById('content').innerHTML = '<p>Belum mendaftar. <a href="signup.html">Daftar sekarang</a></p>';
+            return;
+        }
+        const user = snapshot.val();
+        
+        // Show admin link if role is admin
+        const adminLink = document.getElementById('adminLink');
+        if (adminLink) {
+            if (user.role === 'admin') adminLink.style.display = 'inline-block';
+            else adminLink.style.display = 'none';
+        }
+        
+        // render timeline with all stages
+        const timeline = document.getElementById('timeline');
+        const stages = [
+            { id: 'berkas', title: 'Pengumpulan Berkas' },
+            { id: 'seleksi', title: 'Seleksi Berkas' },
+            { id: 'interview', title: 'Interview' },
+            { id: 'pengumuman', title: 'Pengumuman Akhir' }
+        ];
+        
+        // Get the current stage from user's status
+        const currentStage = user.currentStage || 'berkas';
+        const stageStatuses = user.stageStatuses || {};
 
-                // Also render any status history if present
-                if (user.history && Array.isArray(user.history)) {
-                    user.history.forEach(h => {
-                        const e = document.createElement('li');
-                        e.className = `status-${h.status}`;
-                        e.innerHTML = `<strong>${h.status.toUpperCase()}</strong><div class="meta">${new Date(h.at).toLocaleString()}</div><p>${h.note || ''}</p>`;
-                        timeline.appendChild(e);
-                    });
-                }
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('content').innerText = 'Error loading data.';
-            }
+        stages.forEach(stage => {
+            const status = stageStatuses[stage.id] || (stage.id === currentStage ? 'pending' : 'pending');
+            const li = document.createElement('li');
+            li.className = `status-${status}`;
+            
+            let statusText = status.charAt(0).toUpperCase() + status.slice(1);
+            let date = stageStatuses[stage.id + 'Date'] ? new Date(stageStatuses[stage.id + 'Date']).toLocaleString() : '';
+            let note = stageStatuses[stage.id + 'Note'] || '';
+            
+            li.innerHTML = `
+                <strong>${stage.title}</strong>
+                <div class="meta">Status: ${statusText}</div>
+                ${date ? `<div class="meta">Tanggal: ${date}</div>` : ''}
+                ${note ? `<p>${note}</p>` : ''}
+            `;
+            timeline.appendChild(li);
         });
+        
+        // Hide loading and show timeline
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('timeline').style.display = 'block';
+    } catch (err) {
+        console.error(err);
+        document.getElementById('content').innerText = 'Error loading data.';
+    }
+});
     </script>
 </head>
 <body>
@@ -75,7 +94,8 @@
             </div>
         </div>
         <div id="content">
-            <ul id="timeline" class="timeline"></ul>
+            <div id="loading" style="text-align:center;padding:20px;">Loading...</div>
+            <ul id="timeline" class="timeline" style="display:none"></ul>
         </div>
     </div>
 </body>
