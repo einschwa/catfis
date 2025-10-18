@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin - Asisten Fisika Lab 2</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="theme.js"></script>
+    <script type="module" src="admin.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Panel - Kelola Pelamar</h2>
+        <div style="margin-bottom:12px">
+            <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
+            <button id="adminLogoutBtn" class="btn" style="margin-left:12px">Logout</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>NRP</th>
+                    <th>WhatsApp</th>
+                    <th>Prioritas</th>
+                    <th>CV</th>
+                    <th>Transkrip</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+        </table>
+
+        <div id="statusModal" style="display:none;margin-top:12px">
+            <h3>Update Status</h3>
+            <form id="statusForm">
+                <input type="hidden" id="modalNrp">
+                <select id="modalStatus">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <input id="modalNote" placeholder="Catatan opsional">
+                <button class="btn" type="submit">Simpan</button>
+                <button type="button" id="closeModal" class="btn secondary">Tutup</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

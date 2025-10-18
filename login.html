@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Login - Asisten Fisika Lab 2</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="theme.js"></script>
+    <script type="module">
+    import { initNightMode } from './theme.js';
+    import { loginWithNRP, getCurrentUser } from './auth.js';
+
+        initNightMode();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            if (getCurrentUser()) {
+                window.location.href = 'home.html';
+                return;
+            }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nrp = document.getElementById('nrp').value.trim();
+                const password = document.getElementById('password').value;
+                try {
+                    await loginWithNRP(nrp, password);
+                    window.location.href = 'home.html';
+                } catch (error) {
+                    // Firebase Auth errors have codes
+                    if (error.code === 'auth/user-not-found') {
+                        alert('User belum terdaftar. Silakan daftar terlebih dahulu.');
+                        window.location.href = 'signup.html';
+                    } else if (error.code === 'auth/wrong-password') {
+                        alert('Password salah');
+                    } else {
+                        alert('Terjadi kesalahan saat login: ' + (error.message || error.code));
+                    }
+                }
+            });
+
+            document.getElementById('goSignup').addEventListener('click', () => {
+                window.location.href = 'signup.html';
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label>NRP
+                <input id="nrp" required placeholder="Masukkan NRP (contoh: 5026210012)">
+            </label>
+            <label>Password
+                <input id="password" type="password" required placeholder="Password sederhana (untuk demo)">
+            </label>
+            <p>
+                <button class="btn" type="submit">Login</button>
+                <button type="button" id="goSignup" class="btn secondary">Daftar</button>
+            </p>
+            <p style="margin-top:12px">
+                <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
+            </p>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Home - Asisten Fisika Lab 2</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="theme.js"></script>
+    <script type="module">
+    import { initNightMode } from './theme.js';
+    import { getCurrentUser, logout } from './auth.js';
+    import { ref, get } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+    import { db } from './firebase-init.js';
+
+        initNightMode();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const cu = getCurrentUser();
+            if (!cu) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                logout();
+                window.location.href = 'login.html';
+            });
+
+            // Load user's application data
+            try {
+                const snapshot = await get(ref(db, `users/${cu.uid}`));
+                if (!snapshot.exists()) {
+                    document.getElementById('content').innerHTML = '<p>Belum mendaftar. <a href="signup.html">Daftar sekarang</a></p>';
+                    return;
+                }
+                const user = snapshot.val();
+                // Show admin link if role is admin
+                const adminLink = document.getElementById('adminLink');
+                if (adminLink) {
+                    if (user.role === 'admin') adminLink.style.display = 'inline-block';
+                    else adminLink.style.display = 'none';
+                }
+                // render timeline
+                const timeline = document.getElementById('timeline');
+                const li = document.createElement('li');
+                li.className = `status-${user.status}`;
+                li.innerHTML = `<strong>Status: ${user.status.toUpperCase()}</strong><div class="meta">Diterapkan pada: ${new Date(user.appliedAt).toLocaleString()}</div><p>${user.motivasi}</p>`;
+                timeline.appendChild(li);
+
+                // Also render any status history if present
+                if (user.history && Array.isArray(user.history)) {
+                    user.history.forEach(h => {
+                        const e = document.createElement('li');
+                        e.className = `status-${h.status}`;
+                        e.innerHTML = `<strong>${h.status.toUpperCase()}</strong><div class="meta">${new Date(h.at).toLocaleString()}</div><p>${h.note || ''}</p>`;
+                        timeline.appendChild(e);
+                    });
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('content').innerText = 'Error loading data.';
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h2>Dashboard Pelamar</h2>
+            <div>
+                <button id="logoutBtn" class="btn">Logout</button>
+                <a href="admin.html" class="btn secondary" style="display:none" id="adminLink">Admin</a>
+            </div>
+        </div>
+        <div id="content">
+            <ul id="timeline" class="timeline"></ul>
+        </div>
+    </div>
+</body>
+</html>
