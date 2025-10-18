@@ -58,21 +58,28 @@
         </button>
     </div>
 
-    <div class="container">
-        <h2>Login</h2>
-        <form id="loginForm">
-            <label>NRP
-                <input id="nrp" required placeholder="Masukkan NRP (contoh: 5026210012)">
-            </label>
-            <label>Password
-                <input id="password" type="password" required placeholder="Password sederhana (untuk demo)">
-            </label>
-            <p>
-                <button class="btn" type="submit">Login</button>
-                <button type="button" id="goSignup" class="btn secondary">Daftar</button>
-            </p>
-            <!-- night mode switch moved to fixed position top-right -->
-        </form>
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <div class="auth-logo" aria-hidden="true">🎓</div>
+            <h1 class="auth-title">Asisten Fisika Lab 2</h1>
+            <p class="auth-subtitle">Masuk ke akun Anda</p>
+
+            <form id="loginForm" class="auth-form">
+                <label class="field">NRP
+                    <input id="nrp" class="auth-input" required placeholder="Masukkan NRP Anda">
+                </label>
+                <label class="field">Password
+                    <input id="password" class="auth-input" type="password" required placeholder="Masukkan password Anda">
+                </label>
+
+                <p style="margin-top:12px">
+                    <button class="btn auth-btn" type="submit">Masuk</button>
+                </p>
+                <p style="margin-top:8px;text-align:center">
+                    <button type="button" id="goSignup" class="btn secondary" style="width:160px">Daftar</button>
+                </p>
+            </form>
+        </div>
     </div>
 </body>
 </html>
