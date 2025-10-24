@@ -5,46 +5,95 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Admin - Asisten Fisika Lab 2</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon-phi.svg" type="image/svg+xml">
     <script type="module" src="firebase-init.js"></script>
     <script type="module" src="theme.js"></script>
     <script type="module" src="admin.js"></script>
 </head>
 <body>
+    <!-- fixed night mode toggle (outside container) -->
+    <div class="fixed-night-toggle">
+        <button id="nightModeToggle" class="switch" role="switch" aria-checked="false" aria-label="Toggle night mode" title="Toggle night mode">
+            <span class="slider" aria-hidden="true">
+                <span class="icon icon-moon">🌙</span>
+                <span class="icon icon-sun">☀️</span>
+                <span class="knob" aria-hidden="true"></span>
+            </span>
+        </button>
+    </div>
+
     <div class="container">
         <h2>Admin Panel - Kelola Pelamar</h2>
-        <div style="margin-bottom:12px">
-            <label><input id="nightModeToggle" type="checkbox"> Night Mode</label>
-            <button id="adminLogoutBtn" class="btn" style="margin-left:12px">Logout</button>
+        <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+            <div></div>
+            <div style="display:flex;align-items:center;gap:12px">
+                <button id="adminLogoutBtn" class="btn">Logout</button>
+            </div>
         </div>
-        <table style="width:100%;border-collapse:collapse">
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>NRP</th>
-                    <th>WhatsApp</th>
-                    <th>Prioritas</th>
-                    <th>CV</th>
-                    <th>Transkrip</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="adminTableBody"></tbody>
-        </table>
+        <div class="table-wrapper" style="overflow:auto;">
+            <table style="width:100%;border-collapse:collapse">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>NRP</th>
+                        <th>WhatsApp</th>
+                        <th>Berkas</th>
+                        <th>Seleksi</th>
+                        <th>Interview</th>
+                        <th>Pengumuman</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody"></tbody>
+            </table>
+        </div>
+    </div>
 
-        <div id="statusModal" style="display:none;margin-top:12px">
-            <h3>Update Status</h3>
-            <form id="statusForm">
-                <input type="hidden" id="modalNrp">
-                <select id="modalStatus">
+    <!-- Overlay & modal moved outside of .container to avoid being affected by backdrop blur -->
+    <div id="overlay" class="backdrop" style="display:none"></div>
+
+    <div id="statusModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" style="display:none">
+        <button type="button" id="closeModalIcon" class="modal-close" aria-label="Tutup dialog">×</button>
+        <h3 id="modalTitle">Update Status Tahap <span id="modalStage"></span></h3>
+        <form id="statusForm">
+            <input type="hidden" id="modalNrp">
+            <input type="hidden" id="modalStageId">
+            <div style="margin-bottom:12px">
+                <label>Status:</label>
+                <select id="modalStatus" class="full-width">
                     <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="approved">Diterima</option>
+                    <option value="rejected">Ditolak</option>
                 </select>
-                <input id="modalNote" placeholder="Catatan opsional">
-                <button class="btn" type="submit">Simpan</button>
-                <button type="button" id="closeModal" class="btn secondary">Tutup</button>
-            </form>
+            </div>
+            <div style="margin-bottom:12px">
+                <label>Catatan/Keterangan:</label>
+                <textarea id="modalNote" rows="3" placeholder="Tambahkan catatan atau keterangan disini..."></textarea>
+            </div>
+                <div style="display:flex;gap:12px;justify-content:flex-end">
+                    <button type="button" id="cancelModalBtn" class="btn secondary">Tutup</button>
+                    <button class="btn" type="submit">Simpan</button>
+                </div>
+        </form>
+    </div>
+    
+    <!-- Applicant detail modal -->
+    <div id="applicantModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="applicantModalTitle" tabindex="-1" style="display:none">
+        <button type="button" id="closeApplicantIcon" class="modal-close" aria-label="Tutup dialog">×</button>
+        <h3 id="applicantModalTitle">Data Pelamar</h3>
+        <div id="applicantContent">
+            <p><strong>Nama:</strong> <span id="app_name"></span></p>
+            <p><strong>NRP:</strong> <span id="app_nrp"></span></p>
+            <p><strong>Whatsapp:</strong> <span id="app_wp"></span></p>
+            <p><strong>Motivasi:</strong></p>
+            <p id="app_motivasi"></p>
+            <p><strong>Prioritas:</strong> <span id="app_prioritas"></span></p>
+            <p><strong>Bahasa Pemrograman:</strong> <span id="app_langs"></span></p>
+            <p><strong>Judul Praktikum:</strong> <span id="app_titles"></span></p>
+            <p><strong>Berkas (link):</strong> <a id="app_berkas" href="#" target="_blank">Lihat</a></p>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button id="closeApplicantBtn" class="btn secondary">Tutup</button>
+            </div>
         </div>
     </div>
 </body>
