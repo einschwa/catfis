@@ -244,9 +244,35 @@ async function loadApplicants() {
                     document.getElementById('app_prioritas').textContent = u.prioritas || '';
                     document.getElementById('app_langs').textContent = (u.programmingLanguages || []).join(', ');
                     document.getElementById('app_titles').textContent = (u.researchTitles || []).join(', ');
-                    const berkasLink = u.berkasLink || u.berkas || '#';
+                    // Resolve uploaded file link. Prefer a storage path stored in `Berkas` (or common fallbacks).
                     const berkasEl = document.getElementById('app_berkas');
-                    if (berkasEl) { berkasEl.href = berkasLink; berkasEl.textContent = berkasLink; }
+                    let displayedLink = 'Lihat Berkas';
+                    // possible fields where the DB might have stored the file reference
+                    const storageCandidate = u.Berkas || u.berkasPath || u.berkasStorage || u.berkas || u.berkasURL;
+                    if (storageCandidate) {
+                        try {
+                            // If it's already a URL, use it directly; otherwise try to resolve via getFileURL
+                            if (/^https?:\/\//i.test(storageCandidate)) {
+                                displayedLink = storageCandidate;
+                            } else {
+                                displayedLink = await getFileURL(storageCandidate);
+                            }
+                        } catch (err) {
+                            console.warn('Could not fetch file URL from storage for', storageCandidate, err);
+                            // fallback to any public link stored in berkasLink or the raw candidate
+                            displayedLink = u.berkasLink || storageCandidate || '#';
+                        }
+                    } else if (u.berkasLink) {
+                        displayedLink = u.berkasLink;
+                    }
+
+                    if (berkasEl) {
+                        berkasEl.href = displayedLink;
+                        // tampilkan URL langsung jika ada, atau `#` jika tidak
+                        berkasEl.textContent = displayedLink === '#' ? '#' : displayedLink;
+                        berkasEl.target = '_blank';
+                        berkasEl.rel = 'noopener noreferrer';
+                    }
                     // open applicant modal
                     openApplicantModal();
                 } catch (err) {
