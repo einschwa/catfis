@@ -273,6 +273,9 @@ async function loadApplicants() {
                         berkasEl.target = '_blank';
                         berkasEl.rel = 'noopener noreferrer';
                     }
+                    const berkasLink = u.berkasLink || u.berkas || '#';
+                    const berkasEl = document.getElementById('app_berkas');
+                    if (berkasEl) { berkasEl.href = berkasLink; berkasEl.textContent = berkasLink; }
                     // open applicant modal
                     openApplicantModal();
                 } catch (err) {
