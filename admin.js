@@ -244,23 +244,23 @@ async function loadApplicants() {
                     document.getElementById('app_prioritas').textContent = u.prioritas || '';
                     document.getElementById('app_langs').textContent = (u.programmingLanguages || []).join(', ');
                     document.getElementById('app_titles').textContent = (u.researchTitles || []).join(', ');
-                    // Resolve uploaded file link. Prefer a storage path stored in `Berkas` (or common fallbacks).
+                    // Resolve uploaded file link from berkasURL field
                     const berkasEl = document.getElementById('app_berkas');
-                    let displayedLink = 'Lihat Berkas';
-                    // possible fields where the DB might have stored the file reference
-                    const storageCandidate = u.Berkas || u.berkasPath || u.berkasStorage || u.berkas || u.berkasURL;
-                    if (storageCandidate) {
+                    let displayedLink = '#';
+                    // Get berkasURL from the database
+                    const storedURL = u.berkasURL;
+                    if (storedURL) {
                         try {
                             // If it's already a URL, use it directly; otherwise try to resolve via getFileURL
-                            if (/^https?:\/\//i.test(storageCandidate)) {
-                                displayedLink = storageCandidate;
+                            if (/^https?:\/\//i.test(storedURL)) {
+                                displayedLink = storedURL;
                             } else {
-                                displayedLink = await getFileURL(storageCandidate);
+                                displayedLink = await getFileURL(storedURL);
                             }
                         } catch (err) {
-                            console.warn('Could not fetch file URL from storage for', storageCandidate, err);
-                            // fallback to any public link stored in berkasLink or the raw candidate
-                            displayedLink = u.berkasLink || storageCandidate || '#';
+                            console.warn('Could not fetch file URL from storage for', storedURL, err);
+                            // fallback to the raw stored URL if getFileURL fails
+                            displayedLink = storedURL;
                         }
                     } else if (u.berkasLink) {
                         displayedLink = u.berkasLink;
