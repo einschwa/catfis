@@ -244,9 +244,35 @@ async function loadApplicants() {
                     document.getElementById('app_prioritas').textContent = u.prioritas || '';
                     document.getElementById('app_langs').textContent = (u.programmingLanguages || []).join(', ');
                     document.getElementById('app_titles').textContent = (u.researchTitles || []).join(', ');
-                    const berkasLink = u.berkasLink || u.berkas || '#';
+                    // Resolve uploaded file link from berkasURL field
                     const berkasEl = document.getElementById('app_berkas');
-                    if (berkasEl) { berkasEl.href = berkasLink; berkasEl.textContent = berkasLink; }
+                    let displayedLink = '#';
+                    // Get berkasURL from the database
+                    const storedURL = u.berkasURL;
+                    if (storedURL) {
+                        try {
+                            // If it's already a URL, use it directly; otherwise try to resolve via getFileURL
+                            if (/^https?:\/\//i.test(storedURL)) {
+                                displayedLink = storedURL;
+                            } else {
+                                displayedLink = await getFileURL(storedURL);
+                            }
+                        } catch (err) {
+                            console.warn('Could not fetch file URL from storage for', storedURL, err);
+                            // fallback to the raw stored URL if getFileURL fails
+                            displayedLink = storedURL;
+                        }
+                    } else if (u.berkasLink) {
+                        displayedLink = u.berkasLink;
+                    }
+
+                    if (berkasEl) {
+                        berkasEl.href = displayedLink;
+                        // tampilkan URL langsung jika ada, atau `#` jika tidak
+                        berkasEl.textContent = displayedLink === '#' ? '#' : displayedLink;
+                        berkasEl.target = '_blank';
+                        berkasEl.rel = 'noopener noreferrer';
+                    }
                     // open applicant modal
                     openApplicantModal();
                 } catch (err) {
